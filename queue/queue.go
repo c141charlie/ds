@@ -36,10 +36,7 @@ func (cc *CallCenter) Open() {
 func (cc *CallCenter) Close() {
     fmt.Println("Call center closing")
     
-    for i:=0; i < cc.agents; i++ {
-        cc.queue <- &Call{-1, 1, time.Nanoseconds()}
-    }
-
+    close(cc.queue)
     for d := 0; d < cc.agents; d++ {
         <- cc.clock_out
     }
@@ -50,17 +47,15 @@ func (cc *CallCenter) Close() {
 func agent(id int, clock_in chan bool, queue chan *Call, clock_out chan bool) {
     fmt.Printf("Agent %d logging in\n", id)
     clock_in <- true
-    for {
-        call := <- queue
-        if call.id == -1 {
-            fmt.Printf("Agent %d going home\n", id)
-            clock_out <- true
-            break
-        }
+
+    for call := range queue {
         time.Sleep(int64(call.duration * 1000000))
         fmt.Printf("Agent %d, answering Call %d\n", id, call.id)
-        fmt.Printf("Call %d answered; waited %d milliseconds\n", call.id, (time.Nanoseconds() - call.start_time)/1000000)
+        fmt.Printf("Call %d answered; waited %d milliseconds\n", 
+        call.id, (time.Nanoseconds() - call.start_time)/1000000)
     }
+    fmt.Printf("Agent %d going home\n", id)
+    clock_out <-true
 }
 
 func main() {
