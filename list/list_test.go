@@ -320,3 +320,29 @@ func TestDeleteByValue(t *testing.T) {
 		t.Errorf("2nd element should be \"hello\".")
 	}
 }
+
+func TestClear(t *testing.T) {
+	l := New()
+	l.Add("hello")
+	l.Add("world")
+	l.Add("hello")
+    
+    if l.Length() != 3 {
+        t.Errorf("l.Length() should be 3.\n")
+    }
+
+    l.Clear()
+
+    if l.Length() != 0 {
+        t.Errorf("l.Length() should be 0.\n")
+    }
+
+    if l.First() != nil {
+        t.Errorf("l.First() should be nil.\n")
+    }
+
+    if l.Last() != nil {
+        t.Errorf("l.Last() should be nil.\n")
+    }
+}
+

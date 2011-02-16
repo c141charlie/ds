@@ -31,11 +31,11 @@ func (l *List) Length() int{
 }
 
 func (l *List) First() *Element {
-	return l.First()
+	return l.first
 }
 
 func (l *List) Last() *Element {
-	return l.Last()
+	return l.last
 }
 
 func (l *List) IsEmpty() bool {
@@ -108,7 +108,8 @@ func (l *List) GetByVal(value interface{}) *Element {
 }
 
 func (l *List) Insert(position int, value interface{}) {
-	if position < 0 || position > l.len {
+    
+    if position < 0 || position > l.len {
 		panic (fmt.Sprintf("Insert(position: %d, value: %v) position is out-of-bounds.", position, value))
 	}
 	
@@ -116,17 +117,18 @@ func (l *List) Insert(position int, value interface{}) {
 	
 	if l.last == nil {
 		l.first, l.last = e, e
-		l.len = 1
-		return
+		e.prev, e.next = nil, nil
+        l.len = 1
+        return
 	}
 	
 	if position == 0 {
-		l.insertBefore(e, l.first)
+        l.insertBefore(e, l.first)
 		return
 	}
 	
 	if position == l.len {
-		l.insertAfter(l.last, e)
+        l.insertAfter(l.last, e)
 		return
 	}
 	
@@ -141,11 +143,11 @@ func (l *List) Get(position int) *Element {
 
 func (l *List) insertAfter(mark *Element, e *Element) {
 	if mark.next == nil {
-		l.last = e
+        l.last = e
 	} else {
 		mark.next.prev = e
 	}
-	e.next = mark.next
+    e.next = mark.next
 	mark.next = e
 	e.prev = mark
 	l.len ++
@@ -180,4 +182,8 @@ func(l *List) getElement(position int) *Element {
 	return nil
 }
 
-
+func (l *List) Clear() {
+	l.len = 0
+	l.first = nil
+	l.last = nil
+}
