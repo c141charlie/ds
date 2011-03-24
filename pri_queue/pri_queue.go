@@ -34,7 +34,6 @@ func (pq *PriorityQueue) swim(index int) {
 
 func (pq *PriorityQueue) swap(index1, index2 int) {
     temp := pq.l.Get(index1).Value.(int)
-    fmt.Printf("temp = %d, index1 = %d, index2 = %d\n", temp, index1, index2)
     pq.l.Set(index1, pq.l.Get(index2).Value.(int))
     pq.l.Set(index2, temp)
 }
@@ -68,9 +67,6 @@ func (pq *PriorityQueue) sink(index int) {
             largest_child = right
         }
     }
-    fmt.Println(index)
-    fmt.Println(pq.l.Get(index))
-    fmt.Println(pq.l.Get(largest_child))
 
     if pq.l.Get(index).Value.(int) < pq.l.Get(largest_child).Value.(int) {
         pq.swap(index, largest_child)

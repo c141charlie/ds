@@ -1,189 +1,206 @@
 package list
 
-import "fmt"
+//import "fmt"
 
 type List struct {
-	len int
-	first *Element
-	last *Element
+    head_and_tail *Element 
+    size int
 }
 
-type Element struct {
-	Value interface{}
-	prev *Element
-	next *Element
+
+func NewList() *List {
+    elem := &Element{nil, nil, nil}
+    elem.setNext(elem)
+    elem.setPrev(elem)
+    return &List{elem, 0}
 }
 
-func (e *Element) Next() *Element {
-	return e.next
+
+func (l *List) Insert(pos int, val interface{}) {
+
+    if pos < 0 || pos > l.size {
+        return 
+    }
+
+    elem := newElement(val)
+
+    elem.attachBefore(l.getElement(pos))
+
+    l.size ++
+
 }
 
-func (e *Element) Prev() *Element {
-	return e.prev
+func (l *List) getElement(pos int) *Element {
+    cur := l.head_and_tail.getNext()
+
+    for i := pos; i > 0; i-- {
+        cur = cur.getNext()
+    }
+
+    return cur
 }
 
-func New() *List{
-	return &List{0, nil, nil}
+func (l *List) Add(val interface{}) {
+    l.Insert(l.size, val)
 }
 
-func (l *List) Length() int{
-	return l.len
+func (l *List) Get(pos int) interface{} {
+    if pos < 0 || pos >= l.size {
+        return nil
+    }
+    return l.getElement(pos).GetValue()
 }
 
-func (l *List) First() *Element {
-	return l.first
+func (e *Element) GetValue() interface{} {
+    return e.value
 }
 
-func (l *List) Last() *Element {
-	return l.last
+func (l *List) Set(pos int, val interface{}) {
+    if pos < 0 || pos >= l.size {
+        return
+    }
+    elem := l.getElement(pos)
+
+    elem.setValue(val)
+}
+
+
+func (l *List) IndexOf(val interface{}) int {
+    pos := 0
+
+    for elem := l.head_and_tail.getNext();
+        elem != l.head_and_tail;
+        elem = elem.getNext() {
+
+        if val == elem.value {
+            return pos
+        }
+
+        pos ++
+    }
+
+    return -1
+}
+
+func (l *List) Contains(val interface{}) bool {
+    return -1 != l.IndexOf(val)
+}
+
+func (l *List) Delete(pos int) interface{} {
+    if pos < 0 || pos >= l.size {
+        return nil
+    }
+
+    elem := l.getElement(pos)
+    elem.detach()
+    l.size --
+    return elem.GetValue()
+}
+
+func (l *List) DeleteByVal(val interface{}) bool {
+    for elem := l.head_and_tail.getNext();
+        elem != l.head_and_tail;
+        elem = elem.getNext() {
+
+        if val == elem.GetValue() {
+            elem.detach()
+            l.size --
+            return true
+        }
+
+    }
+    return false
+}
+
+func (l *List) Size() int {
+    return l.size
 }
 
 func (l *List) IsEmpty() bool {
-	if l.len > 0 {
-		return false
-	}
-	return true
-}
-
-func (l *List) Add(value interface{}) {
-	l.Insert(l.len, value)
-}
-
-func (l *List) Set(position int, value interface{}) {
-	e := l.Get(position)
-	e.Value = value
-	
-}
-
-func(l *List) Delete(position int) {
-	e:= l.Get(position)
-	l.delete(e)
-}
-
-func (l *List) DeleteByVal(value interface{}) {
-	i := 0
-	for e:= l.first; e != nil; e = e.next {
-		if e.Value == value {
-			l.delete(e)
-			break
-		}
-		i++
-	}
-}
-
-func (l *List) delete(e *Element) {
-	if e != nil {
-		if l.first == e && l.last == e {
-			l.first, l.last = nil, nil
-			l.len --
-			return
-		}
-		
-		if e == l.first {
-			l.first = e.next
-			e.next.prev = nil
-			l.len--
-			return
-		}
-		
-		if e == l.last {
-			l.last = e.prev
-			e.prev.next = nil
-			l.len--
-			return
-		}
-		e.prev.next = e.next
-		e.next.prev = e.prev
-		l.len--
-	}
-}
-
-func (l *List) GetByVal(value interface{}) *Element {
-	for e:= l.first; e != nil; e = e.next {
-		if e.Value == value {
-			return e
-		}
-	}
-	return nil
-}
-
-func (l *List) Insert(position int, value interface{}) {
-    
-    if position < 0 || position > l.len {
-		panic (fmt.Sprintf("Insert(position: %d, value: %v) position is out-of-bounds.", position, value))
-	}
-	
-	e := &Element{value, nil, nil}
-	
-	if l.last == nil {
-		l.first, l.last = e, e
-		e.prev, e.next = nil, nil
-        l.len = 1
-        return
-	}
-	
-	if position == 0 {
-        l.insertBefore(e, l.first)
-		return
-	}
-	
-	if position == l.len {
-        l.insertAfter(l.last, e)
-		return
-	}
-	
-	mark := l.getElement(position)
-	l.insertBefore(e, mark)
-}
-
-func (l *List) Get(position int) *Element {
-	return l.getElement(position)
-}
-
-
-func (l *List) insertAfter(mark *Element, e *Element) {
-	if mark.next == nil {
-        l.last = e
-	} else {
-		mark.next.prev = e
-	}
-    e.next = mark.next
-	mark.next = e
-	e.prev = mark
-	l.len ++
-}
-
-func (l *List) insertBefore(e *Element, mark *Element) {
-	if mark.prev == nil {
-		l.first = e
-	} else {
-		mark.prev.next = e
-	}
-	e.prev = mark.prev
-	mark.prev = e
-	e.next = mark
-	l.len ++
-}
-
-
-func(l *List) getElement(position int) *Element {
-	if position < 0 || position >= l.len {
-		panic (fmt.Sprintf("getElement(%d) is out-of-bounds.", position))
-	}
-	
-	current := l.first
-	
-	for i:=0; i <=position; i++ {
-		if i == position {
-			return current
-		}
-		current = current.next
-	}
-	return nil
+    return l.size == 0
 }
 
 func (l *List) Clear() {
-	l.len = 0
-	l.first = nil
-	l.last = nil
+
+
 }
+
+type Element struct { 
+    value interface{}
+    prev *Element
+    next *Element
+}
+
+func newElement(val interface{}) *Element{
+    return &Element{val, nil, nil}
+}
+
+func (e *Element) setValue(val interface{}) {
+    e.value = val
+}
+
+func (e *Element) getValue() interface{} {
+    return e.value
+}
+
+func (e *Element) getPrevious() *Element {
+    return e.prev
+}
+
+func (e *Element) getNext() *Element {
+    return e.next
+}
+
+func (e *Element) setPrev(elem *Element) {
+    e.prev = elem
+}
+
+func (e *Element) setNext(elem *Element) {
+    e.next = elem
+}
+
+func (e *Element) attachBefore(next *Element) {
+    prev := next.getPrevious()
+    e.prev = prev
+    e.next = next
+    next.setPrev(e)
+    prev.setNext(e)
+
+}
+
+func (e *Element) detach() {
+    e.prev.setNext(e.next)
+    e.next.setPrev(e.prev)
+}
+
+
+type Iterator struct {
+    list *List
+    cur *Element
+}
+
+func NewIterator(list *List) *Iterator { 
+    return &Iterator{list, list.head_and_tail}    
+}
+
+func (i *Iterator) First() *Element {
+    i.cur = i.list.getElement(0)
+    return i.cur
+}
+
+func (i *Iterator) Next() *Element {
+    i.cur = i.cur.getNext()
+    return i.cur
+}
+
+func (i *Iterator) Current() *Element {
+    return i.cur
+}
+
+func (i *Iterator) IsDone() bool {
+    if i.cur == i.list.head_and_tail {
+        return true
+    }
+    return false
+}
+
