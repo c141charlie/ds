@@ -7,17 +7,36 @@ const load_factor = 0.75
 
 type Map struct {
     buckets *list.List
+    iterator *list.Iterator
 }
 
 func NewMap() *Map {
-    return &Map{list.NewList()}
+    l := list.NewList()
+    i := list.NewIterator(l)
+    return &Map{l, i}
+}
+
+func (m *Map) First() *KeyValue {
+    return m.iterator.First().GetValue().(*KeyValue)
+}
+
+func (m *Map) Next() {
+    m.iterator.Next()
+}
+
+func (m *Map) Current() *KeyValue {
+    return m.iterator.Current().GetValue().(*KeyValue)
+}
+
+func (m *Map) IsDone() bool {
+    return m.iterator.IsDone()
 }
 
 func (m *Map) Set(key interface{}, value interface{}) {
     kv := m.getKeyValueFor(key)
     
     if kv != nil {
-        kv.Key = key
+        kv.Value = value
         return
     }
     
@@ -40,17 +59,31 @@ func (m *Map) Contains(key interface{}) bool {
     return false
 }
 
-func (m *Map) Get(key interface{}) *KeyValue {
+func (m *Map) Get(key interface{}) interface{} {
     i := list.NewIterator(m.buckets)
 
     for i.First(); !i.IsDone(); i.Next() {
         c := i.Current().GetValue().(*KeyValue)
 
         if c.Equals(key) {
-            return c
+            return c.Value
         }
     }
     return nil
+}
+
+func (m *Map) Delete(key interface{}) bool {
+   
+    i := list.NewIterator(m.buckets)
+
+    for i.First(); !i.IsDone(); i.Next() {
+        c := i.Current().GetValue().(*KeyValue)
+
+        if c.Equals(key) {
+            return m.buckets.DeleteByVal(c)
+        }
+    }
+    return false
 }
 
 func (m *Map) getKeyValueFor(key interface{}) *KeyValue{
@@ -66,6 +99,14 @@ func (m *Map) getKeyValueFor(key interface{}) *KeyValue{
     }
 
     return nil
+}
+
+func (m *Map) Size() int {
+    return m.buckets.Size()
+}
+
+func (m *Map) Clear() {
+    m.buckets.Clear()
 }
 
 type KeyValue struct {
@@ -92,39 +133,52 @@ type Hashable interface {
 }
 
 type Hashtable struct {
+    maps []*Map
     size int
-    slots []*list.List //slice of buckets
 }
 
 func NewHashtable() *Hashtable {
-    return &Hashtable{0, make([]*list.List, default_capacity)}
+    return &Hashtable{make([]*Map, default_capacity), 0}
 }
 
 
-func (h *Hashtable) Insert(key Hashable, value interface{}) bool{
-    //get correct linked list
-    //b := h.getBuckets(key)
-
-    //see if key is in the list
-        //if so update it
-        //else insert it
-    
-    
-    //increase the size by 1
-
-    //resize the list if necessary
-    return false
+func (h *Hashtable) Insert(key Hashable, value interface{}) {
+    key_vals := h.getBuckets(key)
+    key_vals.Set(key, value)
+    h.size ++
 }
 
-func (h *Hashtable) getBuckets(key Hashable) *list.List {
-    bucket_list := h.slots[key.Hash() % len(h.slots)]
+func (h *Hashtable) Get(key Hashable) interface{} {
+    key_vals := h.getBuckets(key)
+    return key_vals.Get(key)
+}
 
-    if bucket_list == nil {
-        bucket_list = list.NewList()
-        h.slots[key.Hash() %len(h.slots)] = bucket_list
+func (h *Hashtable) Delete(key Hashable) {
+    key_vals := h.getBuckets(key)
+    
+    if key_vals.Delete(key) {
+        h.size --        
+    }
+}
+
+func (h *Hashtable) Contains(key Hashable) bool {
+
+    key_vals := h.getBuckets(key)
+
+    return key_vals.Contains(key)
+
+}
+
+func (h *Hashtable) getBuckets(key Hashable) *Map{
+    i := abs(key.Hash() % len(h.maps))
+    key_vals := h.maps[i]
+
+    if key_vals == nil {
+        key_vals = NewMap()
+        h.maps[i] = key_vals
     }
 
-    return bucket_list
+    return key_vals
 }
 
 
@@ -133,23 +187,37 @@ func (h *Hashtable) Size() int {
 }
 
 func (h *Hashtable) numSlots() int {
-    return len(h.slots)
+    return len(h.maps)
 }
 
-
-
-type Key struct {
-    key string
-}
-
-func (k *Key) Hash() int {
-    a := []int(k.key)
-    result := 0
-
-    for i:= 0; i < len(a); i++ {
-        result = result * 31 + a[i] 
+func (h *Hashtable) maintainLoad() {
+    if h.loadFactorExceeded() {
+        h.resize()
     }
-    return result
+}
+
+func (h *Hashtable) loadFactorExceeded() bool {
+    return h.size > len(h.maps) * load_factor
+}
+
+func (h *Hashtable) resize() {
+
+    i := nextPrime(len(h.maps))
+
+    fmt.Println(i)
+
+    //do more stuff here
+
+
+}
+
+
+
+func abs(i int) int {
+    if i < 0 {
+        return -i
+    }
+    return i
 }
 
 func nextPrime(i int) int {
@@ -169,6 +237,5 @@ func nextPrime(i int) int {
     }
     return nextPrime(i+1)
 }
-
 
 

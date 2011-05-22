@@ -122,6 +122,9 @@ func (l *List) IsEmpty() bool {
 
 func (l *List) Clear() {
 
+    l.head_and_tail.next = l.head_and_tail
+    l.head_and_tail.prev = l.head_and_tail
+    l.size = 0
 
 }
 

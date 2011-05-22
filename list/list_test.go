@@ -290,3 +290,33 @@ func TestIteration(t *testing.T) {
         t.Errorf("i.IsDone() should be true.\n")
     }
 }
+
+func TestClear(t  *testing.T) {
+    l := NewList()
+    i := NewIterator(l)
+    l.Insert(0, A)
+    l.Insert(1, B)
+    l.Insert(2, C)
+
+    l.Clear()
+
+    if l.Size() !=0 {
+        t.Errorf("l.Size() should be 0\n")
+    }
+
+    if i.First() != l.head_and_tail {
+        t.Errorf("i.First() should equal l.head_and_tail.\n")
+    }
+
+    if i.Next() != l.head_and_tail {
+        t.Errorf("i.Next() should equal l.head_and_tail.\n")
+    }
+
+    if i.IsDone() != true {
+        t.Errorf("i.IsDone() should equal true.\n")
+    }
+    
+
+
+
+}
