@@ -2,6 +2,7 @@ package hash
 
 import "testing"
 
+
 type Key struct {
     key string
 }
@@ -24,8 +25,8 @@ func TestHash(t *testing.T) {
         t.Errorf("h.Size() should be 0.\n")
     }
 
-    if h.numSlots() != 17 {
-        t.Errorf("h.numSlots() should be 17.\n")
+    if h.numSlots() != default_capacity{
+        t.Errorf("h.numSlots() should be default_capacity.\n")
     }
 
     s := h.getBuckets(&Key{"hello"})
@@ -412,7 +413,23 @@ func TestHashtableContains(t *testing.T) {
     }
 }
 
+func TestHashtableResize(t *testing.T) {
 
+    h := NewHashtable()
+
+    k1 := &Key{"Lale"}
+    h.Insert(k1, "Ismen")
+    
+    k2 := &Key{"Charles"}
+    h.Insert(k2, "Thompson")
+
+    k3 := &Key{"John"}
+    h.Insert(k3, "Thompson")
+
+    k4 := &Key{"Debbie"}
+    h.Insert(k4, "Thompson")
+
+}
 
 
 

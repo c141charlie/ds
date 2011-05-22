@@ -2,8 +2,8 @@ package hash
 
 import "list"
 
-const default_capacity = 17
-const load_factor = 0.75
+const default_capacity = 3
+const load_factor = 75
 
 type Map struct {
     buckets *list.List
@@ -43,6 +43,7 @@ func (m *Map) Set(key interface{}, value interface{}) {
     key_val_pair := NewKeyValue(key, value)
     
     m.buckets.Add(key_val_pair)
+    
 
 }
 
@@ -146,6 +147,7 @@ func (h *Hashtable) Insert(key Hashable, value interface{}) {
     key_vals := h.getBuckets(key)
     key_vals.Set(key, value)
     h.size ++
+    h.maintainLoad()
 }
 
 func (h *Hashtable) Get(key Hashable) interface{} {
@@ -197,17 +199,25 @@ func (h *Hashtable) maintainLoad() {
 }
 
 func (h *Hashtable) loadFactorExceeded() bool {
-    return h.size > len(h.maps) * load_factor
+    return h.size > len(h.maps) * load_factor/100
 }
 
 func (h *Hashtable) resize() {
+    maps_copy := h.maps
+    np := nextPrime(2 * len(h.maps))
+    replacement := make([]*Map, np)
+    h.maps = replacement
 
-    i := nextPrime(len(h.maps))
+    for i := 0; i < len(maps_copy); i++ {
+        if maps_copy[i] != nil {
+            for maps_copy[i].First(); !maps_copy[i].IsDone(); maps_copy[i].Next() {
+                key_value := maps_copy[i].Current()
+                h.Insert(key_value.Key.(Hashable), key_value.Value)
+            }
 
-    fmt.Println(i)
+        }
 
-    //do more stuff here
-
+    }
 
 }
 
