@@ -1,10 +1,26 @@
 package ternary
 
 import "testing"
-import "fmt"
 
 var tree *TernaryTree = NewTernaryTree()
 
+func setup() {
+    tree.Add("car")
+}
+
+func TestContains(t *testing.T) {
+    setup()
+    if tree.Contains("car") == false {
+        t.Errorf("tree should contain \"car\"")
+    }
+}
+
+
+
+
+
+
+/*
 func setup() {
     tree.Add("prefabricate")
     tree.Add("presume")
@@ -20,7 +36,6 @@ func setup() {
     tree.Add("mince")
     tree.Add("minty")
 }
-
 
 func TestContains(t *testing.T) {
     
@@ -70,3 +85,5 @@ func TestContains(t *testing.T) {
 func TestPrefixSearch(t *testing.T) {
     fmt.Println("hello")
 }
+
+*/

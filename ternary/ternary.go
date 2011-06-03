@@ -13,11 +13,12 @@ func NewTernaryTree() *TernaryTree {
 func (t *TernaryTree) Contains(word string) bool {
     if word == "" { return false } 
     node := search(t.root, word, 0)
-    return node != nil && node.isEndOfWord()
+    return node == nil
 }
 
 func search(node *Node, word string, index int) *Node {
-    if word == "" { return }
+    if word == "" { return nil}
+    return nil
 }
 
 func (t *TernaryTree) Add(word string) {
@@ -29,6 +30,45 @@ func (t *TernaryTree) Add(word string) {
     }
 }
 
+func insert(node *Node, word string, index int) *Node {
+
+    //base case
+    if index < 1 {
+        return node
+    }
+
+    if node == nil {
+        //make a new node
+        //recurse
+    }
+
+
+
+
+    
+
+    if node.Child == nil {
+        
+    }
+
+    if node.Left == nil && node.Right == nil {
+        
+    }
+
+    /*
+    Rune int
+    Smaller *Node
+    Larger *Node
+    Child *Node
+    Word []int
+    */
+
+}
+
+
+
+
+/*
 func insert(node *Node, word string, index int) *Node {
     runes := []int(word)
     rune := runes[index]
@@ -50,6 +90,8 @@ func insert(node *Node, word string, index int) *Node {
     }
     return node
 }
+*/
+
 
 type Node struct {
     
@@ -64,7 +106,7 @@ func NewNode(rune int) *Node {
     return &Node{rune, nil, nil, nil, nil}
 }
 
-func (n *Node) isEndOfWord() {
+func (n *Node) isEndOfWord() bool {
     return n.Word != nil
 }
 
