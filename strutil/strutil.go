@@ -4,23 +4,25 @@ import "os"
 
 func SearchUsingBruteForce(pattern string, text string) (int, os.Error) {
     if text == "" || pattern == "" {
-        return 0, os.NewError("text cannot be empty")
+        return -1, os.NewError("text cannot be empty")
     }
 
     runes_pattern := []int(pattern)
     runes_text := []int(text)
 
-    i := 0
+    cur := 0
 
-    for i <= len(runes_text) - len(runes_pattern) {
-        x := 0    
-        for x < len(runes_pattern) {
-            if runes_text[i + x] == runes_pattern[x]
+    for cur <= len(runes_text) - len(runes_pattern) {
+        pos := 0    
+        for pos < len(runes_pattern) && runes_pattern[pos] == runes_text[cur+pos] {
+            pos ++
         }
-
+        if pos == len(runes_pattern) {
+            return cur, nil
+        }
+        cur ++
     }
-
-    return 0, os.NewError("pattern not found")
     
+    return -1, os.NewError("pattern not found")
 }
 
