@@ -6,6 +6,7 @@ var tree *TernaryTree = NewTernaryTree()
 
 func setup() {
     tree.Add("car")
+    tree.Add("cat")
 }
 
 func TestContains(t *testing.T) {
@@ -13,9 +14,15 @@ func TestContains(t *testing.T) {
     if tree.Contains("car") == false {
         t.Errorf("tree should contain \"car\"")
     }
+
+    if tree.Contains("cat") == false {
+        t.Errorf("tree should contain \"cat\"")
+    }
 }
 
-
+func TestTraversal(t *testing.T) {
+    tree.BreadthFirstTraversal(tree.root)
+}
 
 
 
