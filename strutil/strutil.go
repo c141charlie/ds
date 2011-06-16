@@ -35,27 +35,31 @@ func Search(pattern string, text string) (int, os.Error) {
     runes_pattern := []int(pattern)
     runes_text := []int(text)
 
+    s := 0
+
+    rune := -1
+
     last := computeLastOccurance(pattern)
 
-    from := 0
+    for s <= len(runes_text) - len(runes_pattern) {
+    
+        i := len(runes_pattern) - 1
 
-    for from <= len(runes_text) - len(runes_pattern) {
-
-        i := len(runes_pattern)-1
-        c := 0
-        for i >= 0 && runes_pattern[i] == runes_text[from + i] {
-            c = runes_text[from + i]
+        for i >= 0 && runes_pattern[i] == runes_text[s+i] {
+            rune = runes_text[s+i]
             i --
-        }
 
-        if i < 0 {
-            return from, nil
         }
-        from += max(i - last[c], 1)
+        
+        if i < 0 {
+            return s, nil
+        }
+        
+        s += max(i - last[rune], 1)
+        rune = -1
     }
 
-
-    return -1, os.NewError("String not found")
+    return -1, os.NewError("Not found yet")
 }
 
 func computeLastOccurance(pattern string) map[int]int {
@@ -67,7 +71,6 @@ func computeLastOccurance(pattern string) map[int]int {
     for i := 0; i < len(runes_pattern); i ++ {
         last[runes_pattern[i]] = i
     }
-
     return last
 }
 

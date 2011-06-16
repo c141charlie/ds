@@ -9,7 +9,6 @@ func SearchFunction() func(string, string) (int, os.Error) {
     return Search
 }
 
-
 func TestFindOneLetterMatch(t *testing.T) {
     str := "a"
     pattern := "a"
@@ -23,7 +22,18 @@ func TestFindOneLetterMatch(t *testing.T) {
     }
 
 }
+func TestFindThreeLettersInTheMiddle(t *testing.T) {
+    str := "abcabcd"
+    pattern := "abcd"
 
+    f := SearchFunction()
+
+    pos, err := f(pattern, str)
+
+    if pos != 3 || err != nil {
+        t.Errorf("pos should be 6, but is %d, and err should be nil\n", pos)
+    }
+}
 func TestFindTwoLetterMatch(t *testing.T) {
     str := "cd"
     pattern := "cd"
@@ -71,4 +81,3 @@ func TestPatternDoesNotExistInText(t *testing.T) {
         t.Errorf("pos should be -1 and err should not be nil\n")
     }
 }
-
